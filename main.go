@@ -30,26 +30,29 @@ var (
 )
 
 func main() {
-	args := os.Args[1:]
+	_, hErr := getParam("-h")
+	_, helpErr := getParam("--help")
+	_, taErr := getParam("-ta")
+	_, tryAlarmErr := getParam("--try-alarm")
 
-	if len(args) > 0 {
-		if args[0] == "--help" || args[0] == "-h" {
-			fmt.Println("Page Tracker 1.0.0")
-			fmt.Println("")
-			fmt.Println("Usage:")
-			fmt.Println("  command [arguments]:")
-			fmt.Println("")
-			fmt.Println("Options:")
-			fmt.Println("  -h, --help       Display this help message")
-			fmt.Println("  -ta, --try-alarm Try the alarm")
-			fmt.Println("")
+	if hErr == nil || helpErr == nil {
+		fmt.Println("Page Tracker 1.0.0")
+		fmt.Println("")
+		fmt.Println("Usage:")
+		fmt.Println("  command [arguments]:")
+		fmt.Println("")
+		fmt.Println("Options:")
+		fmt.Println("  -h, --help       Display this help message")
+		fmt.Println("  -ta, --try-alarm Try the alarm")
+		fmt.Println("")
 
-			return
-		}
+		return
+	}
 
-		if args[0] == "--try-alarm" || args[0] == "-ta" {
-			alarm()
-		}
+	if taErr == nil || tryAlarmErr == nil {
+		alarm()
+
+		return
 	}
 
 	for true {
@@ -102,6 +105,23 @@ func check() {
 
 		alarm()
 	}
+}
+
+func getParam(name string) (string, error) {
+	args := os.Args[1:]
+	last := len(args) - 1
+
+	for i, param := range args {
+		if param == name {
+			if i == last {
+				return "true", nil
+			} else {
+				return args[i+1], nil
+			}
+		}
+	}
+
+	return "", fmt.Errorf("Param not found")
 }
 
 func alarm() {
